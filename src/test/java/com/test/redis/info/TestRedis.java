@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 @RunWith(SpringRunner.class)
@@ -44,8 +43,36 @@ public class TestRedis {
             ops.set(key, new Person("luo", 25));
         }
         System.out.println("Found key " + key + ", value=" + ops.get(key));
+    }
 
-        System.out.println(redisTemplate.opsForValue().get("info"));
+    @Test
+    public void testObjectList() {
+        ValueOperations<String, List<Person>> ops = redisTemplate.opsForValue();
+
+        String key = "personList";
+        if (!redisTemplate.hasKey(key)) {
+            List<Person> personList = new ArrayList<>();
+            personList.add(new Person("luo", 25));
+
+            ops.set(key, personList);
+        }
+        System.out.println("Found key " + key + ", value=" + ops.get(key));
+    }
+
+    @Test
+    public void testObjectList2() {
+        ListOperations<String, List<Person>> ops = redisTemplate.opsForList();
+
+        String key = "personList2";
+        if (!redisTemplate.hasKey(key)) {
+            List<Person> personList = new ArrayList<>();
+            personList.add(new Person("luo", 25));
+            personList.add(new Person("bei", 24));
+
+            ops.leftPush(key, personList);
+        }
+
+        System.out.println(ops.range(key, 0, -1));
     }
 
     @Test
