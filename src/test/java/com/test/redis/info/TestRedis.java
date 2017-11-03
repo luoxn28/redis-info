@@ -43,6 +43,7 @@ public class TestRedis {
             ops.set(key, new Person("luo", 25));
         }
         System.out.println("Found key " + key + ", value=" + ops.get(key));
+        System.out.println(ops.get(key).getClass());
     }
 
     @Test
