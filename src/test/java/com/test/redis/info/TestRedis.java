@@ -1,5 +1,7 @@
 package com.test.redis.info;
 
+import com.luo.redis.info.bean.InfoServer;
+import com.luo.redis.info.service.InfoService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -97,6 +100,56 @@ public class TestRedis {
         });
 
         System.out.println(result[0]);
+    }
+
+    @Test
+    public void testCallback2() {
+        final Properties[] result = {null};
+
+        redisTemplate.execute(new RedisCallback<Object>() {
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                Properties properties = connection.info("keyspace");
+                System.out.println(properties);
+
+                Enumeration<String> nameList = (Enumeration<String>) properties.propertyNames();
+                while (nameList.hasMoreElements()) {
+                    System.out.println(nameList.nextElement());
+                }
+
+                result[0] = properties;
+                return null;
+            }
+        });
+    }
+
+    @Test
+    public void testCallback3() {
+        final Properties[] result = {null};
+
+        redisTemplate.execute(new RedisCallback<Object>() {
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                Properties properties = connection.info();
+                System.out.println(properties);
+
+                Enumeration<String> nameList = (Enumeration<String>) properties.propertyNames();
+                while (nameList.hasMoreElements()) {
+                    System.out.println(nameList.nextElement());
+                }
+
+                result[0] = properties;
+                return null;
+            }
+        });
+    }
+
+    @Autowired
+    InfoService infoService;
+
+    @Test
+    public void testInfo() {
+        System.out.println(infoService.getInfoBean());
     }
 
 }
